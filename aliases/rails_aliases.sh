@@ -1,6 +1,7 @@
 #rails aliases
 # rails 3 shortcut 'r'
-alias r='rails'
+alias rails='be rails'
+alias r='be rails'
 alias greproutes='rake routes | grep'
 
 # launching console/server
