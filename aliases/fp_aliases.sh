@@ -1,3 +1,7 @@
 alias cm='cd /vagrant'
 alias infra='/home/infra'
 alias infra='cd ~/infra'
+alias orders_service='cd ~/orders_service'
+alias catalog_service='cd ~/catalog_service'
+alias customer_service='cd ~/customerservice'
+alias turnstile='cd ~/turnstile'
