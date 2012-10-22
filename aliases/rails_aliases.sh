@@ -49,7 +49,7 @@ alias rdbda='rake db:drop:all'
 
 # tests
 alias rspec='bundle exec rspec'
-alias cukes='bundle exec cucumber --tags ~@manual --tags ~@omniture'
+alias cukes='bundle exec cucumber --tags ~@integrationtest --tags ~@manual'
 
 # rails logs, tailing and cleaning
 alias tdl='tail -f ./log/development.log'
