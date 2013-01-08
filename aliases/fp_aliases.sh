@@ -1,7 +1,7 @@
-alias cm='cd /vagrant'
 alias infra='cd ~/infra'
 alias ordersservice='cd ~/orders_service'
 alias catalogservice='cd ~/catalog_service'
 alias customerservice='cd ~/customerservice'
 alias turnstile='cd ~/turnstile'
 alias paymentservice='cd ~/payment_service'
+alias cm='cd ~/competition_management'
