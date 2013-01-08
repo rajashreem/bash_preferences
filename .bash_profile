@@ -34,7 +34,7 @@ YELLOW="\[\033[0;33m\]"
 GREEN="\[\033[0;32m\]"
 BLUE="\[\033[0;34m\]"
 
-PS1="$RED\w $YELLOW\$(parse_git_branch)$BLUE\$(rails_env)$GREEN\$"
+PS1="$RED\w $YELLOW\$(parse_git_branch)$BLUE\$(rails_env)$GREEN\$ "
 
 source ~/bash_preferences/autocomplete/rake_cap_bash_autocomplete.sh
 source ~/bash_preferences/autocomplete/git_completion.bash
