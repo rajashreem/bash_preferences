@@ -46,6 +46,7 @@ alias rdbc='rake db:create'
 alias rdbd='rake db:drop'
 alias rdbca='rake db:create:all'
 alias rdbda='rake db:drop:all'
+alias rdbs='rake db:seed'
 
 # tests
 alias rspec='bundle exec rspec'
