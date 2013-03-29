@@ -37,6 +37,14 @@ sspe () {
   fi
 }
 
+function tdl {
+  tail -$1f log/developement.log
+}
+
+function ttl {
+  tail -$1f log/developement.log
+}
+
 # database migrate
 alias rdbm='rake db:migrate'
 alias rdbmt='rake db:migrate RAILS_ENV=test'
@@ -53,8 +61,6 @@ alias rspec='bundle exec rspec'
 alias cukes='bundle exec cucumber --tags ~@integrationtest --tags ~@manual'
 
 # rails logs, tailing and cleaning
-alias tdl='tail -f ./log/development.log'
-alias ttl='tail -f ./log/test.log'
 alias ctl='> ./log/test.log'
 alias cdl='> ./log/development.log'
 alias sspork='bundle exec spork'
