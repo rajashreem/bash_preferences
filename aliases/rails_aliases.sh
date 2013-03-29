@@ -38,7 +38,7 @@ sspe () {
 }
 
 function tdl {
-  tail -$1f log/developement.log
+  tail -$1f log/development.log
 }
 
 function ttl {
