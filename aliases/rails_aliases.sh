@@ -42,7 +42,7 @@ function tdl {
 }
 
 function ttl {
-  tail -$1f log/developement.log
+  tail -$1f log/test.log
 }
 
 # database migrate
