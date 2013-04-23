@@ -47,9 +47,9 @@ function ttl {
 
 # database migrate
 alias rdbm='rake db:migrate'
-alias rdbmt='rake db:migrate RAILS_ENV=test'
-alias rdbms='rake db:migrate; rake db:seed'
-alias rdbmst='rake db:migrate RAILS_ENV=test; rake db:seed RAILS_ENV=test'
+alias rdbmt='rake db:test:prepare'
+alias rdbms='rake db:migrate db:seed'
+alias rdbmst='RAILS_ENV=test rake db:migrate db:seed'
 alias rdbc='rake db:create'
 alias rdbd='rake db:drop'
 alias rdbca='rake db:create:all'
