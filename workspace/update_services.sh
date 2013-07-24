@@ -73,31 +73,107 @@ function gup
 }
 
 
+printf "\n"
 echo "Updating turnstile.."
-cd turnstile && gup
-cd ../
-echo "Updating customer service.."
-cd customerservice && gup
-echo "Updating entry service.."
-cd ../
-cd entry_service && gup
-cd ../
-echo "Updating legacy service.."
-cd legacy_service && gup
-cd ../
-echo "Updating catalog..."
-cd catalog_service && gup
-echo "Updating orders..."
-cd ../
-cd orders_service && gup
-echo "Updating comp man"
-cd ../
-cd competition_management && gup
-echo "Updating payment service..."
-cd ../
-cd payment_service && gup
-echo "Updating communication service..."
-cd ../
-cd communication_service && gup
+echo "===================="
+cd turnstile && git st && gup
 cd ../
 
+printf "\n"
+echo "Updating customer service.."
+echo "============================"
+cd customerservice && git st && gup
+echo "Updating entry service.."
+cd ../ 
+cd entry_service && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating legacy service.."
+echo "============================"
+cd legacy_service && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating catalog..."
+echo "============================"
+cd catalog_service && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating orders..."
+echo "============================"
+cd orders_service && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating comp man"
+echo "============================"
+cd competition_management && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating payment service..."
+echo "============================"
+cd payment_service && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating communication service..."
+echo "============================"
+cd communication_service && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating infra..."
+echo "============================"
+cd infra && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating communication service client..."
+echo "============================"
+cd communication_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating payment service client..."
+echo "============================"
+cd payment_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating orders service client..."
+echo "============================"
+cd orders_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating entry service client..."
+echo "============================"
+cd entry_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating competition service client..."
+echo "============================"
+cd competition_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating customer service client..."
+echo "============================"
+cd customer_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating catalog service client.."
+echo "============================"
+cd catalog_service_client && git st && gup
+cd ../
+
+printf "\n"
+echo "Updating scheduler.."
+echo "============================"
+cd scheduler && git st && gup
+cd ../
