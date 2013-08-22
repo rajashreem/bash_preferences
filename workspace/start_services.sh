@@ -10,7 +10,7 @@ cd entry_service && bundle install && bundle exec rake db:reset && bundle exec r
 cd legacy_service && bundle install && bundle exec rake db:reset && bundle exec rake db:migrate && bundle exec rake db:migrate RAILS_ENV=test && bundle exec rails s -p3002 &
 
 #cd orders_service && bundle install && bundle exec rake db:reset && bundle exec rake db:migrate && bundle exec rake db:migrate RAILS_ENV=test && bundle exec rails s -p3004 &
-cd orders_service && bundle install && bundle exec rake db:reset && bundle exec rake db:migrate && bundle exec rake db:migrate RAILS_ENV=test && bundle exec unicorn_rails -c unicorn.conf.minimal.rb -D
+cd orders_service && bundle install && bundle exec rake db:reset && bundle exec rake db:migrate && bundle exec rake db:migrate RAILS_ENV=test && bundle exec unicorn_rails -c unicorn.conf.minimal.rb -D &
 
 cd payment_service && bundle install && bundle exec rake db:reset && bundle exec rake db:migrate && bundle exec rake db:migrate RAILS_ENV=test && bundle exec rails s -p3005 &
 cd communication_service && bundle install && bundle exec rake db:reset && bundle exec rails s -p3008 &
