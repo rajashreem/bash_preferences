@@ -31,19 +31,26 @@ class ServiceUtility
 
     def kill_services
       @@services.keys.each do |service|
-        begin
-          pid_file = "#{service}/tmp/pids/unicorn.pid"
-          pid = (File.read pid_file).to_i
-          puts "Terminating #{service}"
-          #Process.kill "TERM", pid
-          Process.kill 0, pid
-          Process.kill "QUIT", pid
-        rescue Errno::ENOENT, Errno::ESRCH => e
-          puts "#{service} not running..."
-        rescue => e
-          puts "Unable to terminate #{service}"
-        end
+        kill(service)
       end
+    end
+
+    def kill(service=nil)
+      service ||= ARGV[1]
+      begin
+        pid_file = "#{service}/tmp/pids/unicorn.pid"
+        pid = (File.read pid_file).to_i
+        puts "Terminating #{service}"
+        #Process.kill "TERM", pid
+        Process.kill 0, pid
+        Process.kill "QUIT", pid
+      rescue Errno::ENOENT, Errno::ESRCH => e
+        puts "#{service} not running..."
+      rescue => e
+        puts "Unable to terminate #{service}"
+        return false
+      end
+      return true
     end
 
     def list_running
@@ -113,6 +120,10 @@ class ServiceUtility
 
     def start_service(service_name, options)
 
+      puts "killing any existing instance first..."
+
+      kill(service_name)
+
       puts "Starting #{service_name}"
       `cd #{service_name} && gem install unicorn` unless `cd #{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
 
@@ -133,10 +144,7 @@ class ServiceUtility
       environment = options[:environment]
       environment ||= "development"
 
-      use_bundled_unicorn = !`cd #{service_name} && bundle list`.lines.grep(/^unicorn \(.*\)/).empty?
-      #
-      #require "pry"
-      #binding.pry
+      use_bundled_unicorn = `cd #{service_name} && bundle list`.match("unicorn")
 
       rake_tasks = ["rake db:reset","rake db:migrate"]
 

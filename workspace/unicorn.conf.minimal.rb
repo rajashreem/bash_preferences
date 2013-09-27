@@ -9,5 +9,17 @@
 #listen 2007 # by default Unicorn listens on port 8080
 worker_processes 2 # this should be >= nr_cpus
 pid "tmp/pids/unicorn.pid"
-#stderr_path "/path/to/app/shared/log/unicorn.log"
-#stdout_path "/path/to/app/shared/log/unicorn.log"
+stderr_path "log/unicorn.err.log"
+stdout_path "log/unicorn.log"
+
+preload_app true
+
+timeout 30
+
+before_fork do |server, worker|
+  defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
+end
+
+after_fork do |server, worker|
+  defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
+end
