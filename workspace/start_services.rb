@@ -136,10 +136,6 @@ class ServiceUtility
       Service.build(service_name).kill
     end
 
-    def services
-      @@services.keys.collect { |service_name | Service.build(service_name) }
-    end
-
     def list_running
       alive_services = []
       dead_services = []
@@ -197,6 +193,10 @@ class ServiceUtility
 
     private
 
+    def services
+      @@services.keys.collect { |service_name | Service.build(service_name) }
+    end
+
     def start_service(service_name, options)
 
       puts "killing any existing instance first..."
@@ -204,9 +204,9 @@ class ServiceUtility
       kill(service_name)
 
       puts "Starting #{service_name}"
-      `cd #{WORKSPACE}/#{service_name} && gem install unicorn` unless `cd #{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
+      `cd #{WORKSPACE}/#{service_name} && gem install unicorn` unless `cd #{WORKSPACE}/#{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
 
-      if `cd #{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
+      if `cd #{WORKSPACE}/#{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
         if options[:depends_on].nil?
           boot_service(service_name, options)
         else
@@ -227,7 +227,7 @@ class ServiceUtility
 
       rake_tasks = ["rake db:migrate", "rake db:reset"]
 
-      cmd = "export RAILS_ENV=#{environment} && cd #{service_name} && bundle install"
+      cmd = "export RAILS_ENV=#{environment} && cd #{WORKSPACE}/#{service_name} && bundle install"
       rake_tasks.each do |task|
         cmd << "&& bundle exec #{task}" if options[:skip].nil? || !options[:skip].include?(task)
       end

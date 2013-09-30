@@ -1,1 +1,1 @@
-./start_services.rb
+./start_services.rb "$@"
