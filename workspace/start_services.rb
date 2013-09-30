@@ -24,9 +24,10 @@ class ServiceUtility
 
     end
 
-    attr_accessor :service_name, :port, :environment, :workers
+    attr_accessor :service_name, :port, :environment, :workers, :exclude
 
     def initialize(service, options)
+      @exclude = false
       @service_name = service
       options.each_pair do |option_key, option_value|
         send("#{option_key}=", option_value) if respond_to? "#{option_key}="
@@ -54,6 +55,19 @@ class ServiceUtility
         return false
       end
       return true
+    end
+
+    def disabled?
+      exclude
+    end
+
+    def running?
+      begin
+        Process.kill 0, pid
+        true
+      rescue Errno::ENOENT, Errno::ESRCH => e
+        false
+      end
     end
 
     private
@@ -122,33 +136,29 @@ class ServiceUtility
       Service.build(service_name).kill
     end
 
+    def services
+      @@services.keys.collect { |service_name | Service.build(service_name) }
+    end
+
     def list_running
       alive_services = []
       dead_services = []
       disabled_services = []
-      @@services.each_pair do |service, options|
-        if options[:exclude]
+
+      services.each do |service|
+        if service.disabled?
           disabled_services << service
+        elsif service.running?
+          alive_services << service
         else
-
-          begin
-            pid_file = "#{service}/tmp/pids/unicorn.pid"
-            pid = (File.read pid_file).to_i
-            Process.kill 0, pid
-            #puts "#{service} is running..."
-            alive_services << service
-          rescue Errno::ENOENT, Errno::ESRCH => e
-            #puts "#{service} does NOT appear to be running..."
-            dead_services << service
-          end
-
+          dead_services << service
         end
       end
 
       puts "Alive Services"
       puts "=============="
       alive_services.each do |alive_service|
-        puts alive_service
+        puts alive_service.service_name
       end
 
       puts ""
@@ -158,7 +168,7 @@ class ServiceUtility
       puts "Dead Services"
       puts "=============="
       dead_services.each do |dead_service|
-        puts dead_service
+        puts dead_service.service_name
       end
 
       puts ""
@@ -168,7 +178,7 @@ class ServiceUtility
       puts "Disabled Services"
       puts "=============="
       disabled_services.each do |disabled_service|
-        puts disabled_service
+        puts disabled_service.service_name
       end
 
     end
@@ -194,7 +204,7 @@ class ServiceUtility
       kill(service_name)
 
       puts "Starting #{service_name}"
-      `cd #{service_name} && gem install unicorn` unless `cd #{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
+      `cd #{WORKSPACE}/#{service_name} && gem install unicorn` unless `cd #{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
 
       if `cd #{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
         if options[:depends_on].nil?
@@ -213,7 +223,7 @@ class ServiceUtility
       environment = options[:environment]
       environment ||= "development"
 
-      use_bundled_unicorn = `cd #{service_name} && bundle list`.match("unicorn")
+      use_bundled_unicorn = `cd #{WORKSPACE}/#{service_name} && bundle list`.match("unicorn")
 
       rake_tasks = ["rake db:migrate", "rake db:reset"]
 
@@ -271,14 +281,11 @@ class ServiceUtility
         start_service(service_name, options) unless options[:exclude]
       end
 
-      puts "Starting silverpop mock"
-      system "cd silverpop_mock && bundle install && bundle exec rails s -p9001 &"
-
     end
 
     def start_resque_for(service_name)
       puts "Starting resque for #{service_name}"
-      system "cd #{service_name} && bundle exec rake resque:work QUEUE=orders_service &"
+      system "cd #{WORKSPACE}/#{service_name} && bundle exec rake resque:work QUEUE=orders_service &"
     end
 
     def start_resque
