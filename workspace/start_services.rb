@@ -10,12 +10,26 @@ class ServiceUtility
 
   class Service
 
+    class << self
+
+      def build(service_name)
+        options = ServiceUtility.class_variable_get("@@services")[service_name]
+        if options.nil?
+          puts "Could not find service definition for #{service_name}"
+          false
+        else
+          Service.new(service_name, options)
+        end
+      end
+
+    end
+
     attr_accessor :service_name, :port, :environment, :workers
 
     def initialize(service, options)
       @service_name = service
       options.each_pair do |option_key, option_value|
-        send("#{option_key}=",option_value) if respond_to? "#{option_key}="
+        send("#{option_key}=", option_value) if respond_to? "#{option_key}="
       end
     end
 
@@ -27,8 +41,19 @@ class ServiceUtility
       @config_location ||= generate_config
     end
 
-    def service_location
-      "#{ServiceUtility::WORKSPACE}/#{service_name}"
+    def kill
+      begin
+        puts "Terminating #{service_name}"
+        #Process.kill "TERM", pid
+        Process.kill 0, pid
+        Process.kill "QUIT", pid
+      rescue Errno::ENOENT, Errno::ESRCH => e
+        puts "#{service_name} not running..."
+      rescue => e
+        puts "Unable to terminate #{service_name}"
+        return false
+      end
+      return true
     end
 
     private
@@ -42,6 +67,22 @@ class ServiceUtility
       File.open(config_path, 'w') { |file| file.write(result) }
 
       config_path
+    end
+
+    def service_location
+      "#{ServiceUtility::WORKSPACE}/#{service_name}"
+    end
+
+    def tmp
+      "#{service_location}/tmp"
+    end
+
+    def pid_file
+      "#{tmp}/pids/unicorn.pid"
+    end
+
+    def pid
+      (File.read pid_file).to_i
     end
 
   end
@@ -76,22 +117,9 @@ class ServiceUtility
       end
     end
 
-    def kill(service=nil)
-      service ||= ARGV[1]
-      begin
-        pid_file = "#{service}/tmp/pids/unicorn.pid"
-        pid = (File.read pid_file).to_i
-        puts "Terminating #{service}"
-        #Process.kill "TERM", pid
-        Process.kill 0, pid
-        Process.kill "QUIT", pid
-      rescue Errno::ENOENT, Errno::ESRCH => e
-        puts "#{service} not running..."
-      rescue => e
-        puts "Unable to terminate #{service}"
-        return false
-      end
-      return true
+    def kill(service_name=nil)
+      service_name ||= ARGV[1]
+      Service.build(service_name).kill
     end
 
     def list_running
