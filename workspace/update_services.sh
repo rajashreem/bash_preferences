@@ -77,10 +77,20 @@ declare -a services=(turnstile customerservice entry_service catalog_service ord
 
 for service in "${services[@]}"
 do
-  printf "\n"
-  echo "Updating ${service}.."
-  echo "===================="
-  cd ${service} && git st && gup
-  cd ../
+
+  if [ ! -d "$service" ]; then
+    printf "\n"
+    echo "Could not find so cloning, $service"
+    echo "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+"
+    git clone git@github.com:Sportech/${service}.git
+  else
+    printf "\n"
+    echo "Updating ${service}.."
+    echo "===================="
+    cd ${service} && git st && gup
+    cd ../
+  fi
+
+
 
 done
