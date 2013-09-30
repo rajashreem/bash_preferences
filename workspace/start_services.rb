@@ -2,8 +2,49 @@
 
 require "net/http"
 require "uri"
+require "erb"
 
 class ServiceUtility
+
+  WORKSPACE = "#{Dir.home}/workspace"
+
+  class Service
+
+    attr_accessor :service_name, :port, :environment, :workers
+
+    def initialize(service, options)
+      @service_name = service
+      options.each_pair do |option_key, option_value|
+        send("#{option_key}=",option_value) if respond_to? "#{option_key}="
+      end
+    end
+
+    def workers
+      @workers || 2
+    end
+
+    def config
+      @config_location ||= generate_config
+    end
+
+    def service_location
+      "#{ServiceUtility::WORKSPACE}/#{service_name}"
+    end
+
+    private
+
+    def generate_config
+      template_path = File.read("#{WORKSPACE}/bash_preferences/workspace/unicorn.conf.minimal.rb.erb")
+      config_path = "#{service_location}/tmp/unicorn.conf.rb"
+
+      renderer = ERB.new(template_path)
+      result = renderer.result(binding)
+      File.open(config_path, 'w') { |file| file.write(result) }
+
+      config_path
+    end
+
+  end
 
   class << self
 
@@ -17,7 +58,7 @@ class ServiceUtility
         "competition_management" => {:port => 3006},
         "entry_service" => {:port => 3007},
         "communication_service" => {:port => 3008},
-        "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset","rake db:migrate"]}
+        "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1}
     }
 
     def start_all
@@ -146,14 +187,16 @@ class ServiceUtility
 
       use_bundled_unicorn = `cd #{service_name} && bundle list`.match("unicorn")
 
-      rake_tasks = ["rake db:reset","rake db:migrate"]
+      rake_tasks = ["rake db:migrate", "rake db:reset"]
 
       cmd = "export RAILS_ENV=#{environment} && cd #{service_name} && bundle install"
       rake_tasks.each do |task|
         cmd << "&& bundle exec #{task}" if options[:skip].nil? || !options[:skip].include?(task)
       end
 
-      cmd << "&& #{use_bundled_unicorn ? "bundle exec" : ""} unicorn_rails -p#{port} -c ../bash_preferences/workspace/unicorn.conf.minimal.rb -E #{environment} -D"
+      service_obj = Service.new(service_name, options)
+
+      cmd << "&& #{use_bundled_unicorn ? "bundle exec" : ""} unicorn_rails -p#{port} -c #{service_obj.config} -E #{environment} -D"
 
       system cmd
       options[:booted] = true
