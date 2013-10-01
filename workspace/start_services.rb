@@ -78,6 +78,8 @@ class ServiceUtility
 
       renderer = ERB.new(template_path)
       result = renderer.result(binding)
+      tmp_dir = File.dirname(config_path)
+      Dir.mkdir(tmp_dir) unless File.directory?(tmp_dir)
       File.open(config_path, 'w') { |file| file.write(result) }
 
       config_path
