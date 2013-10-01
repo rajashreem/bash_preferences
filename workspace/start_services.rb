@@ -8,12 +8,25 @@ class ServiceUtility
 
   WORKSPACE = "#{Dir.home}/workspace"
 
+  SERVICES = {
+      "turnstile" => {:port => 3000, :exclude => true},
+      "customerservice" => {:port => 3001, :environment => "testintegration"},
+      "legacy_service" => {:port => 3002, :exclude => true},
+      "catalog_service" => {:port => 3003, :depends_on => "competition_management"},
+      "orders_service" => {:port => 3004},
+      "payment_service" => {:port => 3005},
+      "competition_management" => {:port => 3006},
+      "entry_service" => {:port => 3007},
+      "communication_service" => {:port => 3008},
+      "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1}
+  }
+
   class Service
 
     class << self
 
       def build(service_name)
-        options = ServiceUtility.class_variable_get("@@services")[service_name]
+        options = ServiceUtility::SERVICES[service_name]
         if options.nil?
           puts "Could not find service definition for #{service_name}"
           false
@@ -70,6 +83,11 @@ class ServiceUtility
       end
     end
 
+    def tail(service=nil)
+      service ||= ARGV[1]
+      services[service].tail
+    end
+
     private
 
     def generate_config
@@ -105,18 +123,7 @@ class ServiceUtility
 
   class << self
 
-    @@services = {
-        "turnstile" => {:port => 3000, :exclude => true},
-        "customerservice" => {:port => 3001, :environment => "testintegration"},
-        "legacy_service" => {:port => 3002, :exclude => true},
-        "catalog_service" => {:port => 3003, :depends_on => "competition_management"},
-        "orders_service" => {:port => 3004},
-        "payment_service" => {:port => 3005},
-        "competition_management" => {:port => 3006},
-        "entry_service" => {:port => 3007},
-        "communication_service" => {:port => 3008},
-        "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1}
-    }
+
 
     def start_all
       create_sftp_user
@@ -128,15 +135,15 @@ class ServiceUtility
       list_running
     end
 
-    def kill_services
-      @@services.keys.each do |service|
-        kill(service)
+    def kill_all
+      services.values.each do |service|
+        service.kill
       end
     end
 
     def kill(service_name=nil)
       service_name ||= ARGV[1]
-      Service.build(service_name).kill
+      service[service_name].kill
     end
 
     def list_running
@@ -144,7 +151,7 @@ class ServiceUtility
       dead_services = []
       disabled_services = []
 
-      services.each do |service|
+      services.values.each do | service|
         if service.disabled?
           disabled_services << service
         elsif service.running?
@@ -184,7 +191,7 @@ class ServiceUtility
 
     def start
       service_name = ARGV[1]
-      options = @@services[service_name]
+      options = SERVICES[service_name]
       if options.nil?
         puts "#{service_name} is not a valid service"
       elsif options[:exclude]
@@ -228,7 +235,10 @@ class ServiceUtility
     end
 
     def services
-      @@services.keys.collect { |service_name| Service.build(service_name) }
+      @services ||= SERVICES.keys.inject({}) do |services_collection, service_name|
+        services_collection[service_name] = Service.build(service_name)
+        services_collection
+      end
     end
 
     def start_service(service_name, options)
@@ -276,9 +286,9 @@ class ServiceUtility
 
     def boot_service_after_dependency(service_name, tries = 0)
 
-      service_options = @@services[service_name]
+      service_options = SERVICES[service_name]
       dependency_name = service_options[:depends_on]
-      dependency_options = @@services[dependency_name]
+      dependency_options = SERVICES[dependency_name]
 
       puts "Waiting to start #{service_name} after #{dependency_name}"
       dependency_port = dependency_options[:port]
@@ -311,7 +321,7 @@ class ServiceUtility
     end
 
     def start_services
-      @@services.each_pair do |service_name, options|
+      SERVICES.each_pair do |service_name, options|
         start_service(service_name, options) unless options[:exclude]
       end
 
