@@ -117,6 +117,7 @@ class ServiceUtility
     }
 
     def start_all
+      create_sftp_user
       kill_services
       clear_redis
       start_services
@@ -193,8 +194,39 @@ class ServiceUtility
 
     private
 
+    def create_sftp_user(user_name="vagrant", password=nil)
+      password ||= user_name
+      puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+      if  RbConfig::CONFIG['host_os'].include? "linux"
+        if File.read("/etc/passwd").match("^#{user_name}:").nil?
+          puts "creating #{user_name} user"
+          new_home_dir = "/home/#{user_name}"
+          system "sudo useradd -d #{new_home_dir} -m #{user_name} && echo #{user_name}:#{password} | sudo chpasswd"
+        else
+          puts "#{user_name} user already exists not creating"
+        end
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+
+
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+        puts "Ensuring Turnstile and tmp directories exists"
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+        home_dir = `echo ~#{user_name}`.chomp
+
+        ["#{home_dir}/Turnstile","#{home_dir}/tmp"].each do | dir |
+          system "sudo mkdir -p #{dir} " unless File.directory?(dir)
+        end
+
+      else
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+        puts "Cant create user #{user_name} on host OS"
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+        sleep 20
+      end
+    end
+
     def services
-      @@services.keys.collect { |service_name | Service.build(service_name) }
+      @@services.keys.collect { |service_name| Service.build(service_name) }
     end
 
     def start_service(service_name, options)
