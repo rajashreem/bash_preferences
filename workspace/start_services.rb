@@ -159,6 +159,8 @@ class ServiceUtility
 
       uri = URI.parse("http://localhost:#{dependency_port}")
 
+      tries = 0
+
       begin
         Net::HTTP.get_response(uri)
         boot_service
