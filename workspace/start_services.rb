@@ -37,7 +37,9 @@ class ServiceUtility
 
     end
 
-    attr_accessor :service_name, :port, :environment, :workers, :exclude
+    attr_accessor :service_name, :port, :environment, :workers, :exclude, :depends_on, :skip
+
+    alias_method :dependency_name, :depends_on
 
     def initialize(service, options)
       @exclude = false
@@ -49,6 +51,10 @@ class ServiceUtility
 
     def workers
       @workers || 2
+    end
+
+    def environment
+      @environment || "development"
     end
 
     def config
@@ -70,6 +76,36 @@ class ServiceUtility
       return true
     end
 
+    def start
+
+      if disabled?
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+"
+        puts "not starting #{service_name} as it is disabled"
+        puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+"
+        return false
+      end
+
+      puts "killing any existing instance of #{service_name} first..."
+
+      kill
+
+      puts "Starting #{service_name}"
+      `cd #{service_location} && gem install unicorn` unless `cd #{service_location} && gem list`.lines.grep(/^unicorn \(.*\)/)
+
+      if `cd #{service_location} && gem list`.lines.grep(/^unicorn \(.*\)/)
+        if depends_on.nil?
+          boot_service
+        else
+          boot_service_after_dependency
+        end
+      else
+        puts "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+"
+        puts "Unable to start #{service_name} as unicorn is still not installed"
+        puts "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+"
+      end
+
+    end
+
     def disabled?
       exclude
     end
@@ -83,12 +119,63 @@ class ServiceUtility
       end
     end
 
-    def tail(service=nil)
-      service ||= ARGV[1]
-      services[service].tail
+    def booted?
+      @booted
+    end
+
+    def tail
+      exec "tail -f #{log_file}"
     end
 
     private
+
+    def boot_service
+      use_bundled_unicorn = `cd #{service_location} && bundle list`.match("unicorn")
+
+      rake_tasks = ["rake db:migrate", "rake db:reset"]
+
+      cmd = "export RAILS_ENV=#{environment} && cd #{service_location} && bundle install"
+      rake_tasks.each do |task|
+        cmd << "&& bundle exec #{task}" if skip.nil? || !skip.include?(task)
+      end
+
+
+      cmd << "&& #{use_bundled_unicorn ? "bundle exec" : ""} unicorn_rails -p#{port} -c #{config} -E #{environment} -D"
+
+      puts "booting #{service_name} with command..."
+      puts cmd
+      puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+
+      @booted = system(cmd)
+
+    end
+
+    def boot_service_after_dependency
+
+      puts "Waiting to start #{service_name} after #{dependency_name}"
+
+      dependency_service = ServiceUtility.services[dependency_name]
+      dependency_port = dependency_service.port
+
+      uri = URI.parse("http://localhost:#{dependency_port}")
+
+      begin
+        Net::HTTP.get_response(uri)
+        boot_service
+      rescue Errno::ECONNREFUSED => e
+        # only try to start the dependancy if its not already started but only start it once
+        dependency_service.start unless dependency_service.booted?
+
+        sleep(5)
+        tries += 1
+        if tries < 20
+          retry
+        else
+          puts "Aborting startup of #{service_name} as #{dependency_name} has not started after #{tries*5} seconds"
+        end
+      end
+
+    end
 
     def generate_config
       template_path = File.read("#{WORKSPACE}/bash_preferences/workspace/unicorn.conf.minimal.rb.erb")
@@ -105,6 +192,10 @@ class ServiceUtility
 
     def service_location
       "#{ServiceUtility::WORKSPACE}/#{service_name}"
+    end
+
+    def log_file
+      "#{service_location}/log/#{environment}.log"
     end
 
     def tmp
@@ -124,10 +215,9 @@ class ServiceUtility
   class << self
 
 
-
     def start_all
       create_sftp_user
-      kill_services
+      kill_all
       clear_redis
       start_services
       start_resque
@@ -143,7 +233,7 @@ class ServiceUtility
 
     def kill(service_name=nil)
       service_name ||= ARGV[1]
-      service[service_name].kill
+      services[service_name].kill
     end
 
     def list_running
@@ -151,7 +241,7 @@ class ServiceUtility
       dead_services = []
       disabled_services = []
 
-      services.values.each do | service|
+      services.values.each do |service|
         if service.disabled?
           disabled_services << service
         elsif service.running?
@@ -191,15 +281,32 @@ class ServiceUtility
 
     def start
       service_name = ARGV[1]
-      options = SERVICES[service_name]
-      if options.nil?
+      service = services[service_name]
+      if service.nil?
         puts "#{service_name} is not a valid service"
-      elsif options[:exclude]
-        puts "#{service_name} is disabled"
       else
-        start_service(service_name, options)
+        service.start
       end
     end
+
+    def tail(service_name=nil)
+      service_name ||= ARGV[1]
+      service = services[service_name]
+      if service.nil?
+        puts "#{service_name} not valid"
+      else
+        service.tail
+      end
+    end
+
+    def services
+      @services ||= SERVICES.keys.inject({}) do |services_collection, service_name|
+        services_collection[service_name] = Service.build(service_name)
+        services_collection
+      end
+    end
+
+    protected
 
     private
 
@@ -222,7 +329,7 @@ class ServiceUtility
         puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
         home_dir = `echo ~#{user_name}`.chomp
 
-        ["#{home_dir}/Turnstile","#{home_dir}/tmp"].each do | dir |
+        ["#{home_dir}/Turnstile", "#{home_dir}/tmp"].each do |dir|
           system "sudo mkdir -p #{dir} " unless File.directory?(dir)
         end
 
@@ -231,82 +338,6 @@ class ServiceUtility
         puts "Cant create user #{user_name} on host OS"
         puts "=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
         sleep 20
-      end
-    end
-
-    def services
-      @services ||= SERVICES.keys.inject({}) do |services_collection, service_name|
-        services_collection[service_name] = Service.build(service_name)
-        services_collection
-      end
-    end
-
-    def start_service(service_name, options)
-
-      puts "killing any existing instance first..."
-
-      kill(service_name)
-
-      puts "Starting #{service_name}"
-      `cd #{WORKSPACE}/#{service_name} && gem install unicorn` unless `cd #{WORKSPACE}/#{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
-
-      if `cd #{WORKSPACE}/#{service_name} && gem list`.lines.grep(/^unicorn \(.*\)/)
-        if options[:depends_on].nil?
-          boot_service(service_name, options)
-        else
-          boot_service_after_dependency(service_name)
-        end
-      else
-        puts "Unable to start #{service_name} as unicorn is still not installed"
-      end
-
-    end
-
-    def boot_service(service_name, options)
-      port = options[:port]
-      environment = options[:environment]
-      environment ||= "development"
-
-      use_bundled_unicorn = `cd #{WORKSPACE}/#{service_name} && bundle list`.match("unicorn")
-
-      rake_tasks = ["rake db:migrate", "rake db:reset"]
-
-      cmd = "export RAILS_ENV=#{environment} && cd #{WORKSPACE}/#{service_name} && bundle install"
-      rake_tasks.each do |task|
-        cmd << "&& bundle exec #{task}" if options[:skip].nil? || !options[:skip].include?(task)
-      end
-
-      service_obj = Service.new(service_name, options)
-
-      cmd << "&& #{use_bundled_unicorn ? "bundle exec" : ""} unicorn_rails -p#{port} -c #{service_obj.config} -E #{environment} -D"
-
-      system cmd
-      options[:booted] = true
-    end
-
-    def boot_service_after_dependency(service_name, tries = 0)
-
-      service_options = SERVICES[service_name]
-      dependency_name = service_options[:depends_on]
-      dependency_options = SERVICES[dependency_name]
-
-      puts "Waiting to start #{service_name} after #{dependency_name}"
-      dependency_port = dependency_options[:port]
-      uri = URI.parse("http://localhost:#{dependency_port}")
-
-      begin
-        Net::HTTP.get_response(uri)
-        boot_service(service_name, service_options)
-      rescue Errno::ECONNREFUSED => e
-        # only try to start the dependancy if its not already started but only start it once
-        start_service(dependency_name, dependency_options) unless dependency_options[:booted]
-        sleep(5)
-        tries += 1
-        if tries < 20
-          boot_service_after_dependency(service_name, tries)
-        else
-          puts "Aborting startup of #{service_name} as #{dependency_name} has not started after #{tries*5} seconds"
-        end
       end
     end
 
@@ -321,8 +352,8 @@ class ServiceUtility
     end
 
     def start_services
-      SERVICES.each_pair do |service_name, options|
-        start_service(service_name, options) unless options[:exclude]
+      services.values.each do |service|
+        service.start
       end
 
     end
@@ -348,7 +379,7 @@ if !command.nil? && ServiceUtility.respond_to?(command)
 else
   puts "Incorrect or no command, available commands are.."
 
-  public_commands = (ServiceUtility.methods - Object.methods)
+  public_commands = (ServiceUtility.methods - Object.methods - [:services])
   public_commands.each do |command|
     puts command
   end
