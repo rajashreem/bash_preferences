@@ -224,6 +224,7 @@ class ServiceUtility
       start_services
       start_resque
       sleep 5
+      check_all
       list_running
     end
 
@@ -311,6 +312,12 @@ class ServiceUtility
     protected
 
     private
+
+    def check_all
+      services.values.each do |service|
+        service.start unless service.running?
+      end
+    end
 
     def create_sftp_user(user_name="vagrant", password=nil)
       password ||= user_name
