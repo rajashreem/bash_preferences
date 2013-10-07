@@ -87,7 +87,7 @@ do
     printf "\n"
     echo "Updating ${service}.."
     echo "===================="
-    cd ${service} && git st && gup
+    cd ${service} && git status && gup
     cd ../
   fi
 
