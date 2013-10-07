@@ -3,6 +3,7 @@
 require "net/http"
 require "uri"
 require "erb"
+require 'rbconfig'
 
 class ServiceUtility
 
