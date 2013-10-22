@@ -19,7 +19,8 @@ class ServiceUtility
       "competition_management" => {:port => 3006},
       "entry_service" => {:port => 3007},
       "communication_service" => {:port => 3008},
-      "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1}
+      "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1},
+      "xsgate_mock" => {:port => 9002, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1}
   }
 
   class Service
@@ -158,12 +159,16 @@ class ServiceUtility
       dependency_service = ServiceUtility.services[dependency_name]
       dependency_port = dependency_service.port
 
-      uri = URI.parse("http://localhost:#{dependency_port}")
+      #uri = URI.parse("http://localhost:#{dependency_port}")
 
       tries = 0
 
+      http = Net::HTTP.new("localhost",dependency_port)
+      http.read_timeout=100
+
       begin
-        Net::HTTP.get_response(uri)
+        http.get("/")
+        #Net::HTTP.get_response(uri)
         boot_service
       rescue Errno::ECONNREFUSED => e
         # only try to start the dependancy if its not already started but only start it once
