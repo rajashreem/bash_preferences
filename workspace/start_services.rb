@@ -10,7 +10,7 @@ class ServiceUtility
   WORKSPACE = "#{Dir.home}/workspace"
 
   SERVICES = {
-      "turnstile" => {:port => 3000, :exclude => true},
+      "turnstile" => {:port => 3000},
       "customerservice" => {:port => 3001, :environment => "testintegration"},
       "legacy_service" => {:port => 3002, :exclude => true},
       "catalog_service" => {:port => 3003, :depends_on => "competition_management"},
@@ -19,6 +19,7 @@ class ServiceUtility
       "competition_management" => {:port => 3006},
       "entry_service" => {:port => 3007},
       "communication_service" => {:port => 3008},
+      "offer_service" => {:port => 3009, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1},
       "silverpop_mock" => {:port => 9001, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1},
       "xsgate_mock" => {:port => 9002, :skip => ["rake db:reset", "rake db:migrate"], :workers => 1}
   }
@@ -134,7 +135,7 @@ class ServiceUtility
     def boot_service
       use_bundled_unicorn = `cd #{service_location} && bundle list`.match("unicorn")
 
-      rake_tasks = ["rake db:migrate", "rake db:reset"]
+      rake_tasks = ARGV.include?('norake') ? [] : ["rake db:migrate", "rake db:reset"]
 
       cmd = "export RAILS_ENV=#{environment} && cd #{service_location} && bundle install"
       rake_tasks.each do |task|

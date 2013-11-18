@@ -72,7 +72,7 @@ function gup
   )
 }
 
-declare -a services=(turnstile customerservice entry_service catalog_service orders_service competition_management payment_service communication_service infra communication_service_client payment_service_client orders_service_client entry_service_client competition_service_client customer_service_client catalog_service_client scheduler silverpop_mock xsgate_mock migration_service bash_preferences)
+declare -a services=(turnstile customerservice entry_service catalog_service orders_service competition_management payment_service communication_service infra communication_service_client payment_service_client orders_service_client entry_service_client competition_service_client customer_service_client catalog_service_client scheduler silverpop_mock xsgate_mock migration_service offer_service bash_preferences)
 
 
 for service in "${services[@]}"
