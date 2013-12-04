@@ -1,0 +1,352 @@
+Host gomaster
+HostName 172.17.0.150
+User fpdev
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
+Host uat
+HostName 172.17.0.242
+User pune
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
+Host uatdb
+HostName 172.17.0.245
+User pune
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
+Host perfturn1
+Hostname 192.168.81.171
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfturn2
+Hostname 192.168.81.172
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcust1
+Hostname 192.168.81.112
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcust2
+Hostname 192.168.81.122
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perflegacy1
+Hostname 192.168.81.111
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perflegacy2
+Hostname 192.168.81.121
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcatalog1
+Hostname 192.168.81.114
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcatalog2
+Hostname 192.168.81.124
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perforder1
+Hostname 192.168.81.116
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perforder2
+Hostname 192.168.81.126
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfpayment1
+Hostname 192.168.81.115
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfpayment2
+Hostname 192.168.81.125
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcompman
+Hostname 192.168.81.117
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfentry1
+Hostname 192.168.81.118
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfentry2
+Hostname 192.168.81.128
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcomm1
+Hostname 192.168.81.119
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfcomm2
+Hostname 192.168.81.129
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfshared
+Hostname 192.168.81.113
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfdbmaster
+Hostname 192.168.91.151
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfdbslave
+Hostname 192.168.91.152
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfredismaster
+Hostname 192.168.81.120
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfredisslave1
+Hostname 192.168.81.130
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host perfredisslave2
+Hostname 192.168.81.113
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host proddbmaster
+Hostname 192.168.91.51
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host proddbslave
+Hostname 192.168.91.52
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodturn1
+Hostname 192.168.81.71
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodturn2
+Hostname 192.168.81.72
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcust1
+Hostname 192.168.81.11
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcust2
+Hostname 192.168.81.12
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodlegacy1
+Hostname 192.168.81.13
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodlegacy2
+Hostname 192.168.81.14
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcatalog1
+Hostname 192.168.81.17
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcatalog2
+Hostname 192.168.81.18
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodorder1
+Hostname 192.168.81.21
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodorder2
+Hostname 192.168.81.22
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodpayment1
+Hostname 192.168.81.19
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodpayment2
+Hostname 192.168.81.20
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcompman
+Hostname 10.65.46.100
+User fpdev
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcompmandb
+Hostname 10.66.46.100
+User fpdev
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodentry1
+Hostname 192.168.81.23
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodentry2
+Hostname 192.168.81.24
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcomm1
+Hostname 192.168.81.25
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodcomm2
+Hostname 192.168.81.26
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodshared
+Hostname 192.168.81.15
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodredismaster
+Hostname 192.168.81.27
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host prodredisslave
+Hostname 192.168.81.28
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host proddeployer
+Hostname 192.168.81.220
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
+Host integration
+HostName 172.17.0.233
+User pune
+ServerAliveInterval 30
+ServerAliveCountMax 120
