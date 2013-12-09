@@ -1,3 +1,9 @@
+Host jumpbox
+HostName 172.17.0.150
+User fpdev
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
 Host gomaster
 HostName 172.17.0.150
 User fpdev
