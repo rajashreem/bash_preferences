@@ -216,6 +216,13 @@ ForwardAgent yes
 Port 17510
 ProxyCommand ssh fpdev@jumpbox nc %h %p
 
+Host proddproxy
+Hostname 192.168.90.2
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
 Host prodturnstile1
 Hostname 192.168.81.71
 User jmonserr
