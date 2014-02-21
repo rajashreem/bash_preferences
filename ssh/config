@@ -24,7 +24,7 @@ ServerAliveCountMax 120
 
 Host uat
 HostName 172.17.0.242
-User pune
+User devops
 ServerAliveInterval 30
 ServerAliveCountMax 120
 
