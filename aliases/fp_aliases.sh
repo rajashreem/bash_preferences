@@ -10,4 +10,6 @@ alias communicationservice='cd ~/communication_service'
 alias playthepools='cd ~/playthepools'
 alias deployment='cd ~/deployment'
 alias migrationservice='cd ~/migration_service'
-alias authservice='cd ~/authentication_service'
+
+alias gcall='cd && find -maxdepth 2 -type d -name .git -execdir sh -c "pwd; git stash" \;'
+alias fpsetup='gcall && infra && rake setup:all'
