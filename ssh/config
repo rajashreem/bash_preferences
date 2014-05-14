@@ -1,7 +1,7 @@
 Host fplocal
-HostName 127.0.0.1
+HostName 192.168.33.10
 User vagrant
-Port 2200
+Port 22
 UserKnownHostsFile /dev/null
 StrictHostKeyChecking no
 PasswordAuthentication no
