@@ -34,6 +34,18 @@ User pune
 ServerAliveInterval 30
 ServerAliveCountMax 120
 
+Host ptp_smoke_app
+HostName 172.17.0.251
+User devops
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
+Host ptp_smoke_db
+HostName 172.17.0.252
+User devops
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
 Host perfturnstile1
 Hostname 192.168.81.171
 User jmonserr
