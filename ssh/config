@@ -408,3 +408,10 @@ HostName 172.17.0.233
 User pune
 ServerAliveInterval 30
 ServerAliveCountMax 120
+
+Host perfspocosy
+Hostname 192.168.71.164
+User deploy
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh go@proddeployer nc %h %p
