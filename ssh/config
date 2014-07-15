@@ -410,9 +410,21 @@ ForwardAgent yes
 Port 17510
 ProxyCommand ssh fpdev@jumpbox nc %h %p
 
-Host integration
+Host integration1
 HostName 172.17.0.233
-User pune
+User devops
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
+Host integration2
+HostName 172.17.0.232
+User devops
+ServerAliveInterval 30
+ServerAliveCountMax 120
+
+Host integration3
+HostName 172.17.0.27
+User devops
 ServerAliveInterval 30
 ServerAliveCountMax 120
 
