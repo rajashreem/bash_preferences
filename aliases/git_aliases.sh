@@ -13,6 +13,7 @@ alias gdc='git diff --cached'
 alias gco='git checkout'
 alias gb='git branch'
 alias gl='git log --pretty=oneline'
+alias g='git'
 
 complete -o default -o nospace -F _git_branch gb
 complete -o default -o nospace -F _git_checkout gco
