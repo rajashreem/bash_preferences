@@ -74,6 +74,13 @@ ForwardAgent yes
 Port 17510
 ProxyCommand ssh fpdev@jumpbox nc %h %p
 
+Host perfplaythepools2
+Hostname 192.168.81.182
+User jmonserr
+ForwardAgent yes
+Port 17510
+ProxyCommand ssh fpdev@jumpbox nc %h %p
+
 Host perfcustomerservice1
 Hostname 192.168.81.112
 User jmonserr
