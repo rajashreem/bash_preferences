@@ -15,3 +15,4 @@ alias offerservice='cd ~/offer_service'
 
 alias gcall='cd && find -maxdepth 2 -type d -name .git -execdir sh -c "pwd; git stash" \;'
 alias fpsetup='gcall && infra && rake setup:all'
+alias warmpassenger='sudo netstat -nptel | grep nginx | awk '"'"'{print $4}'"'"' | while read addr; do curl $addr/blah &>/dev/null; echo $addr was hit; done'
