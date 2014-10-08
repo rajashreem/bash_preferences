@@ -8,8 +8,12 @@ PasswordAuthentication no
 IdentityFile ~/.vagrant.d/insecure_private_key
 IdentitiesOnly yes
 LogLevel FATAL
-  
-  
+
+Host github.com
+User git
+IdentityFile ~/.ssh/github.id_rsa
+StrictHostKeyChecking no
+
 Host jumpbox
 HostName 172.17.0.150
 User fpdev
