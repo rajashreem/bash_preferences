@@ -12,7 +12,7 @@ alias deployment='cd ~/deployment'
 alias migrationservice='cd ~/migration_service'
 alias scheduler='cd ~/scheduler'
 alias offerservice='cd ~/offer_service'
-
+alias longitudepools='cd ~/longitudepools'
 alias gcall='cd && find -maxdepth 2 -type d -name .git -execdir sh -c "pwd; git stash" \;'
 alias fpsetup='gcall && infra && rake setup:all'
 alias warmpassenger='sudo netstat -nptel | grep nginx | awk '"'"'{print $4}'"'"' | while read addr; do curl $addr/blah &>/dev/null; echo $addr was hit; done'
