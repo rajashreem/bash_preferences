@@ -422,6 +422,13 @@ ForwardAgent yes
 Port 17510
 ProxyCommand ssh fpdev@jumpbox nc %h %p
 
+Host xsgate
+Hostname 10.200.119.111
+User thoughtworks
+ForwardAgent yes
+Port 22
+ProxyCommand ssh uat nc %h %p
+
 Host prodredisslave
 Hostname 192.168.81.28
 User jmonserr
