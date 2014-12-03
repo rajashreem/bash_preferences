@@ -35,7 +35,7 @@ ServerAliveCountMax 120
 
 Host uatdb
 HostName 172.17.0.245
-User pune
+User devops
 ServerAliveInterval 30
 ServerAliveCountMax 120
 
